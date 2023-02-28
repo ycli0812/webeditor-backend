@@ -55,7 +55,6 @@ public class DesignController {
     @PostMapping(path="/save")
     public String saveDesign(@RequestBody Map body) {
         System.out.println(body);
-        // TODO: parse JSON string and save to file
         try {
             ObjectMapper mapper = new ObjectMapper();
             designService.saveDesign(body.get("file").toString(), mapper.writeValueAsString(body.get("content")));

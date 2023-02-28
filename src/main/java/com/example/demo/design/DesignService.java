@@ -45,7 +45,7 @@ public class DesignService {
     public void newDesign(String filename) throws Exception {
         File targetFile = new File("src/main/resources/store/" + filename);
         FileWriter writer = new FileWriter(targetFile);
-        writer.write("{elementSet: {}}");
+        writer.write("{\"elementSet\": {}}");
         writer.close();
     }
 }
