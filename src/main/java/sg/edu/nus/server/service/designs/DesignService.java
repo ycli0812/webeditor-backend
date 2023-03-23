@@ -1,11 +1,9 @@
-package com.example.demo.design;
+package sg.edu.nus.server.service.designs;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
+import sg.edu.nus.server.model.Design;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 

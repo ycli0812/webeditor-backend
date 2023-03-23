@@ -1,9 +1,15 @@
-package com.example.demo.design;
+package sg.edu.nus.server.model;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.Date;
 
+/**
+ * Modeling a circuit file instead a circuit object in verification.
+ *
+ * @author Lyc
+ * @version 2023.02.19
+ */
 public class Design {
     public String getFilename() {
         return filename;
