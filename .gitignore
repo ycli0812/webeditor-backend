@@ -30,7 +30,7 @@ build/
 !**/src/test/**/build/
 
 ### Front-end ###
-src/main/resources/
+src/main/resources
 
 ### VS Code ###
 .vscode/
