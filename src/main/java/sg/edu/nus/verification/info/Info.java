@@ -46,4 +46,28 @@ public class Info {
     public String toString() {
         return String.format("[%s] %s", this.type, this.formatString);
     }
+
+    public ArrayList<String> getInvolvedElementIds() {
+        return involvedElementIds;
+    }
+
+    public void setInvolvedElementIds(ArrayList<String> involvedElementIds) {
+        this.involvedElementIds = involvedElementIds;
+    }
+
+    public String getFormatString() {
+        return formatString;
+    }
+
+    public void setFormatString(String formatString) {
+        this.formatString = formatString;
+    }
+
+    public InfoType getType() {
+        return type;
+    }
+
+    public void setType(InfoType type) {
+        this.type = type;
+    }
 }

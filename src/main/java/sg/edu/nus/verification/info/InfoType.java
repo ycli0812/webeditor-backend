@@ -22,5 +22,9 @@ public enum InfoType {
     /**
      * Used to report serious problems that terminate the verification.
      */
-    ERROR
+    ERROR,
+    /**
+     * Used to report success information.
+     */
+    SUCCESS
 }

@@ -118,4 +118,8 @@ public class Verifier {
 //            }
 //        }
     }
+
+    public ArrayList<Info> getOutput() {
+        return output;
+    }
 }
