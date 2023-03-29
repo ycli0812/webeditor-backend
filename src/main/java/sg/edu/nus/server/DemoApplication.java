@@ -13,10 +13,10 @@ public class DemoApplication {
 		SpringApplication.run(DemoApplication.class, args);
 	}
 
-	@GetMapping("/")
-	public String indexPage() {
-		// return index.html
-		// default template directory: sec/main/resources/templates/
-		return "index";
-	}
+//	@GetMapping("/")
+//	public String indexPage() {
+//		// return index.html
+//		// default template directory: sec/main/resources/templates/
+//		return "index";
+//	}
 }

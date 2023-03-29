@@ -32,7 +32,7 @@ public class DesignService {
 
     public void saveDesign(String filename, String content) throws Exception {
         // open file, throw exception if file not exist
-        File targetFile = new File("src/main/resources/store/" + filename);
+        File targetFile = new File("src/main/resources/" + filename);
         if(!targetFile.exists()) throw new Exception("File " + filename + " not found.");
         // write file
         FileWriter writer = new FileWriter(targetFile);
@@ -41,7 +41,7 @@ public class DesignService {
     }
 
     public void newDesign(String filename) throws Exception {
-        File targetFile = new File("src/main/resources/store/" + filename);
+        File targetFile = new File("src/main/resources/" + filename);
         FileWriter writer = new FileWriter(targetFile);
         writer.write("{\"elementSet\": {}}");
         writer.close();

@@ -14,6 +14,7 @@ import java.util.Map;
 @RestController
 public class DesignController {
     private final DesignService designService;
+    int cnt = 0;
 
     @Autowired
     public DesignController(DesignService designService) {
@@ -23,18 +24,16 @@ public class DesignController {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    // query list of files
     @CrossOrigin
     @GetMapping(path="/designlist")
     public List<Map<String, Object>> getDesigns() {
         String sql = "select * from design";
-        return jdbcTemplate.queryForList(sql);
-//        return List.of(
-//            new Design("design1.json", new Date()),
-//            new Design("测试项目.json", new Date()),
-//            new Design("design3.json", new Date()) // not exist
-//        );
+        List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql);
+        return maps;
     }
 
+    // query specific file by filename
     @CrossOrigin
     @PostMapping(path="/design")
     public String getCertainDesign(@RequestParam("filename") String filename) {
@@ -48,10 +47,43 @@ public class DesignController {
         return jsonStr;
     }
 
+    // create new file
+    @CrossOrigin
+    @GetMapping(path="/create")
+    public String newFile() {
+//        String sql = "insert into design(filename,userId) value('invalid-test.json',1)";
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String filename = "Unnamed file" + (cnt++) + ".json";
+            designService.newDesign(filename);
+            String sql = String.format("insert into design(id, filename, userId) value('%d','%s', 1)", cnt, filename);
+            jdbcTemplate.update(sql);
+//            System.out.println(body.get("file").toString() + ".json");
+        } catch (Exception e) {
+            // TODO: make sure that file is removed and record in DB is dropped
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Create file failed.");
+        }
+        return "good";
+    }
+
+    // delete file by id
+    @CrossOrigin
+    @GetMapping (path = "/delete/{id}")
+    public String deleteFile(@PathVariable("id") int id) {
+        try {
+            String sql = "delete from sys.design where id = ?";
+            jdbcTemplate.update(sql, id);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Delete file failed.");
+        }
+        return "good";
+    }
+
+    // save file
     @CrossOrigin
     @PostMapping(path="/save")
     public String saveDesign(@RequestBody Map body) {
-        System.out.println(body);
+//        System.out.println(body);
         try {
             ObjectMapper mapper = new ObjectMapper();
             designService.saveDesign(body.get("file").toString(), mapper.writeValueAsString(body.get("content")));
@@ -61,21 +93,4 @@ public class DesignController {
         return "good";
     }
 
-    @CrossOrigin
-    @PostMapping(path="/create")
-    public String newFile(@RequestBody Map<String, String> body) {
-//        String sql = "insert into design(filename,userId) value('invalid-test.json',1)";
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            String filename = body.get("file").toString() + ".json";
-            designService.newDesign(filename);
-            String sql = String.format("insert into design(filename,userId) value('%s',1)", filename);
-            jdbcTemplate.update(sql);
-//            System.out.println(body.get("file").toString() + ".json");
-        } catch (Exception e) {
-            // TODO: make sure that file is removed and record in DB is dropped
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Create file failed.");
-        }
-        return "good";
-    }
 }
