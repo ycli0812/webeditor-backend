@@ -9,6 +9,7 @@
 package sg.edu.nus.verification.element;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Resistor extends Element {
     public Resistor(String id, String originId, int originX, int originY, ArrayList<Parameter> features, ArrayList<Pin> pins) {
@@ -28,5 +29,16 @@ public class Resistor extends Element {
     @Override
     protected void analyseFeatures() {
 
+    }
+
+    /**
+     * Resistor is short when the two pins are connected.
+     *
+     * @return If both pins are connected.
+     */
+    @Override
+    public boolean isShort() {
+        List<Pin> pins = this.getPins();
+        return pins.get(0).getConnections().contains(pins.get(1));
     }
 }

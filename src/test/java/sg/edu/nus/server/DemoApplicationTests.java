@@ -5,7 +5,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import sg.edu.nus.server.dao.VerificationTaskRepository;
 import sg.edu.nus.server.model.VerificationTask;
+import sg.edu.nus.verification.pass.ConnectivityAnalysisPass;
+import sg.edu.nus.verification.pass.ImpossibleConnectionPass;
+import sg.edu.nus.verification.pass.ShortElementsPass;
+import sg.edu.nus.verification.pass.UselessElementsPass;
+import sg.edu.nus.verification.verifier.Verifier;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Optional;
 
@@ -16,12 +25,27 @@ class DemoApplicationTests {
 
 	@Test
 	void contextLoads() {
-//		VerificationTask task = new VerificationTask("task_id_01", "RESULT", null, new Date());
-//		repo.save(task);
-//		Optional<VerificationTask> res = repo.findAll();
-//		if(res.isPresent()) {
-//			System.out.println("Time is " + res.get().getTime());
-//		}
+
+	}
+
+	@Test
+	void testVerifier() {
+		Verifier verifier = new Verifier();
+		String sample, target;
+		try {
+			sample = Files.readString(Paths.get("src/main/resources/store/sample.json"));
+			target = Files.readString(Paths.get("src/main/resources/store/design1.json"));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		verifier.updateExample(sample);
+		verifier.updateTarget(target);
+		verifier.addPass(new UselessElementsPass());
+		verifier.addPass(new ImpossibleConnectionPass());
+		verifier.addPass(new ConnectivityAnalysisPass());
+		verifier.addPass(new ShortElementsPass());
+		verifier.executeAllPasses();
+		verifier.summaryInfo();
 	}
 
 }

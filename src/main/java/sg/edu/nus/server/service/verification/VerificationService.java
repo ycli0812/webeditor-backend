@@ -6,10 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sg.edu.nus.server.dao.VerificationTaskRepository;
 import sg.edu.nus.server.model.VerificationTask;
-import sg.edu.nus.server.threads.MyThreadPollExecutor;
+import sg.edu.nus.server.threads.VerificationThreadPoolExecutor;
 import sg.edu.nus.verification.info.Info;
 import sg.edu.nus.verification.pass.ConnectivityAnalysisPass;
 import sg.edu.nus.verification.pass.ImpossibleConnectionPass;
+import sg.edu.nus.verification.pass.ShortElementsPass;
 import sg.edu.nus.verification.pass.UselessElementsPass;
 import sg.edu.nus.verification.verifier.Verifier;
 
@@ -23,11 +24,18 @@ import java.util.*;
  */
 @Service
 public class VerificationService {
+    /**
+     * JPA Repository used to access database.
+     */
     @Autowired
     private VerificationTaskRepository repository;
 
+    /**
+     * Thread pool executor especially for verification tasks.
+     * Note that a service can also be asynchronous by adding notation @Async(name="pool name")
+     */
     @Autowired
-    private MyThreadPollExecutor executor;
+    private VerificationThreadPoolExecutor executor;
 
     public String launchVerificationTask(String targetCircuit, String sampleCircuit) {
         Date now = new Date();
@@ -44,6 +52,7 @@ public class VerificationService {
                 verifier.addPass(new UselessElementsPass());
                 verifier.addPass(new ImpossibleConnectionPass());
                 verifier.addPass(new ConnectivityAnalysisPass());
+                verifier.addPass(new ShortElementsPass());
                 verifier.executeAllPasses();
                 // Transform output of algorithm and update database
                 List<Info> output = verifier.getOutput();

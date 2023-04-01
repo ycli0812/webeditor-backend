@@ -1,5 +1,6 @@
 package sg.edu.nus.server.controller;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import sg.edu.nus.server.service.verification.VerificationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ public class VerificationController {
     @Autowired
     private VerificationService service;
 
+    @CrossOrigin
     @PostMapping("/verify")
     public HashMap<String, String> verify(@RequestBody VerifyParams bodyParam) {
         String taskToken = service.launchVerificationTask(bodyParam.getTarget(), bodyParam.getSample());
@@ -38,6 +40,7 @@ public class VerificationController {
         return responseJson;
     }
 
+    @CrossOrigin
     @PostMapping("/verifyresult")
     public Map<String, Object> getResult(@RequestBody Map<String, String> body) {
         return service.queryVerificationTaskResult(body.get("token"));

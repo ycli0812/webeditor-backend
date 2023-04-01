@@ -1,11 +1,3 @@
-/*
- * Copyright (c) 2023. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
- * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
- * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
- * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
- * Vestibulum commodo. Ut rhoncus gravida arcu.
- */
-
 package sg.edu.nus.verification.pass;
 
 import org.jetbrains.annotations.TestOnly;
@@ -49,6 +41,7 @@ public class ConnectivityAnalysisPass extends Pass {
         Analyser analyser = new Analyser();
         // process target circuit
         analyser.analyse(target);
+        analyser.printResult();
         // TODO process sample circuit
         return true;
     }
@@ -73,7 +66,16 @@ class Analyser {
     private ArrayList<Breadboard> breadboards;
     private ArrayList<Element> elements;
     private ArrayList<Wire> wires;
-    private HashMap<Integer, ArrayList<Pin>> groupMap;
+
+    /**
+     * Map from group hash to Pin list in the group.
+     */
+    private HashMap<Integer, ArrayList<Pin>> elementGroupMap;
+
+    /**
+     * Map from group hash to list of all wire-connected group hashes.
+     */
+    private HashMap<Integer, Set<Integer>> wireGroupMap;
 
     /**
      * Initialize features and load circuit.
@@ -83,11 +85,8 @@ class Analyser {
      *     the constructor. Instead, a circuit will be passed every time when {@code Analyse} is called.
      */
     public Analyser(Circuit circuit) {
+        this();
         this.circuit = circuit;
-        this.breadboards = new ArrayList<>();
-        this.elements = new ArrayList<>();
-        this.wires = new ArrayList<>();
-        this.groupMap = new HashMap<Integer, ArrayList<Pin>>();
         this.classifyElements();
     }
 
@@ -98,7 +97,8 @@ class Analyser {
         this.breadboards = new ArrayList<>();
         this.elements = new ArrayList<>();
         this.wires = new ArrayList<>();
-        this.groupMap = new HashMap<Integer, ArrayList<Pin>>();
+        this.elementGroupMap = new HashMap<>();
+        this.wireGroupMap = new HashMap<>();
     }
 
     /**
@@ -109,14 +109,15 @@ class Analyser {
     public void analyse(Circuit c) {
         this.circuit = c;
         this.classifyElements();
-        this.groupPins();
-        this.analysisWires();
+        this.groupElementPins();
+        this.groupWireEnds();
+        this.mergePinGroups();
         this.connectPins();
     }
 
     @TestOnly
     public void printResult() {
-        for (Map.Entry<Integer, ArrayList<Pin>> entry : this.groupMap.entrySet()) {
+        for (Map.Entry<Integer, ArrayList<Pin>> entry : this.elementGroupMap.entrySet()) {
             ArrayList<Pin> group = entry.getValue();
             int key = entry.getKey();
             System.out.print(key + ": ");
@@ -141,17 +142,69 @@ class Analyser {
     /**
      * Group pins connected by the breadboards.
      */
-    private void groupPins() {
+    private void groupElementPins() {
         for(Element e : this.elements) {
             for(Pin p : e.getPins()) {
-                int hash = this.getHashCode(p.getOriginX(), p.getOriginY());
-                if(hash == -1) continue;
-                if(this.groupMap.get(hash) == null) {
+                int hash = this.getGroupHashCode(p.getOriginX(), p.getOriginY());
+                if(hash == -1) {
+                    System.out.println("Error: not on breadboard.");
+                    continue;
+                }
+                if(this.elementGroupMap.get(hash) == null) {
                     ArrayList<Pin> newList = new ArrayList<Pin>();
                     newList.add(p);
-                    this.groupMap.put(hash, newList);
+                    this.elementGroupMap.put(hash, newList);
                 } else {
-                    this.groupMap.get(hash).add(p);
+                    this.elementGroupMap.get(hash).add(p);
+                }
+            }
+        }
+    }
+
+    /**
+     * Group ends of wires that are connected by the breadboard.
+     */
+    private void groupWireEnds() {
+        for(Wire w : this.wires) {
+            int x1 = w.getX1();
+            int x2 = w.getX2();
+            int y1 = w.getY1();
+            int y2 = w.getY2();
+            int hashCode1 = this.getGroupHashCode(x1, y1);
+            int hashCode2 = this.getGroupHashCode(x2, y2);
+
+            // redundant wire, ignore that
+            if(hashCode1 == hashCode2) continue;
+
+            if(this.wireGroupMap.get(hashCode1) == null && this.wireGroupMap.get(hashCode2) == null) {
+                // the wire connects two strange groups, create a new set and let the two hash code map to it
+                Set<Integer> set = new HashSet<>();
+                set.add(hashCode1);
+                set.add(hashCode2);
+                this.wireGroupMap.put(hashCode1, set);
+                this.wireGroupMap.put(hashCode2, set);
+            } else {
+                // at least one group has been contained in the map
+                Set<Integer> end1Set = this.wireGroupMap.get(hashCode1);
+                Set<Integer> end2Set = this.wireGroupMap.get(hashCode2);
+
+                // add new group and make new reflection in the map
+                if(end1Set != null && end2Set == null) {
+                    end1Set.add(hashCode2);
+                    this.wireGroupMap.put(hashCode2, end1Set);
+                }
+                if(end2Set != null && end1Set == null) {
+                    end2Set.add(hashCode1);
+                    this.wireGroupMap.put(hashCode1, end2Set);
+                }
+
+                // merge sets if the wire connects two sets
+                if(end1Set != null && end2Set != null && end1Set != end2Set) {
+                    Set<Integer> mergedSet = end1Set;
+                    for(int toMerge : end2Set) {
+                        this.wireGroupMap.put(toMerge, mergedSet);
+                    }
+                    mergedSet.addAll(end2Set);
                 }
             }
         }
@@ -160,23 +213,20 @@ class Analyser {
     /**
      * Find out which groups are connected by wires and merge these groups.
      */
-    private void analysisWires() {
-        for(Wire w : this.wires) {
-            int x1 = w.getX1();
-            int x2 = w.getX2();
-            int y1 = w.getY1();
-            int y2 = w.getY2();
-            // get groups of both ends of the wire
-            int hashCode1 = this.getHashCode(x1, y1);
-            ArrayList<Pin> g1 = this.groupMap.get(hashCode1);
-            int hashCode2 = this.getHashCode(x2, y2);
-            ArrayList<Pin> g2 = this.groupMap.get(hashCode2);
-            // check if the wire is between two groups with elements on them
-            if(g1 != null && g2 != null) {
-                if(g1 == g2) continue; // repeated wire, the two groups have been merged
-                // merge two groups and let both hashCode point to the merged group
-                g1.addAll(g2);
-                this.groupMap.put(hashCode2, g1);
+    private void mergePinGroups() {
+        // for each breadboard-connected pin group
+        for(Map.Entry<Integer, ArrayList<Pin>> entry : this.elementGroupMap.entrySet()) {
+            int hashCode = entry.getKey();
+            ArrayList<Pin> curPinTGroup = entry.getValue();
+            if(this.wireGroupMap.get(hashCode) != null) { // check if the pin group is connected by wires
+                // merge wire-connected groups
+                for(int connectedPinGroupHash : this.wireGroupMap.get(hashCode)) {
+                    ArrayList<Pin> connectedPinGroup = this.elementGroupMap.get(connectedPinGroupHash);
+                    if(connectedPinGroup != null && connectedPinGroup != curPinTGroup) {
+                        curPinTGroup.addAll(connectedPinGroup);
+                        this.elementGroupMap.put(connectedPinGroupHash, curPinTGroup);
+                    }
+                }
             }
         }
     }
@@ -187,7 +237,7 @@ class Analyser {
     private void connectPins() {
         // record groups that has been processed because some values in the map could be the same pointers
         Set<ArrayList<Pin>> processedGroups = new HashSet<>();
-        for (Map.Entry<Integer, ArrayList<Pin>> entry : this.groupMap.entrySet()) {
+        for (Map.Entry<Integer, ArrayList<Pin>> entry : this.elementGroupMap.entrySet()) {
             ArrayList<Pin> group = entry.getValue();
             if(processedGroups.contains(group)) {
                 continue;
@@ -212,7 +262,7 @@ class Analyser {
      * @param y y-axis coordinate
      * @return Hash code generated
      */
-    private int getHashCode(int x, int y) {
+    private int getGroupHashCode(int x, int y) {
         for(Breadboard bd : this.breadboards) {
             if (bd.isOnBreadboard(x, y)) {
                 String id = bd.getOriginId();
@@ -220,7 +270,8 @@ class Analyser {
                 int hash = 0;
                 if (area == "upside" || area == "downSide") {
                     hash = Objects.hash(id, area, y);
-                } else {
+                }
+                if (area == "upBoard" || area == "downBoard") {
                     hash = Objects.hash(id, area, x);
                 }
                 return hash;

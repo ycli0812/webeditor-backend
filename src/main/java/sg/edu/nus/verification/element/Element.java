@@ -105,4 +105,13 @@ public abstract class Element {
     public int getOriginY() {
         return originY;
     }
+
+    /**
+     * Check if the element is short.
+     *
+     * @return Result of the check
+     */
+    public boolean isShort() {
+        return false;
+    }
 }

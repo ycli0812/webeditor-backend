@@ -61,7 +61,7 @@ public class Verifier {
                 this.output.add(new Info("Pass " + p.getId() + " completed.", InfoType.INFO));
             }
         }
-        this.output.add(new Info("Verification done.", InfoType.INFO));
+        this.output.add(new Info("Verification done.", InfoType.SUCCESS));
         return true;
     }
 
@@ -98,6 +98,8 @@ public class Verifier {
             res = pass.execute(this.example, this.target, this.donePasses);
             if(res) this.donePasses.add(pass.getId());
         } catch (Exception e) {
+            System.out.println(e);
+            e.printStackTrace();
             res = false;
         } finally {
             this.output.addAll(pass.getOutput());

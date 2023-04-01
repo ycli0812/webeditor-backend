@@ -1,24 +1,19 @@
 package sg.edu.nus.server;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import sg.edu.nus.server.threads.MyThreadPollExecutor;
+import sg.edu.nus.server.threads.VerificationThreadPoolExecutor;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
 @EnableAsync
 public class VerificationExecutorConfig {
     @Bean(name="VerificationExecutor")
-    public MyThreadPollExecutor asyncServiceExecutor() {
+    public VerificationThreadPoolExecutor asyncServiceExecutor() {
 //        logger.info("start VerificationExecutor");
-        MyThreadPollExecutor executor = new MyThreadPollExecutor();
+        VerificationThreadPoolExecutor executor = new VerificationThreadPoolExecutor();
         //配置核心线程数
         executor.setCorePoolSize(5);
         //配置最大线程数
