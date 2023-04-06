@@ -15,7 +15,7 @@ public class ConnectionMatchingPass extends Pass {
     }
 
     @Override
-    public Boolean execute(Circuit example, Circuit target, ArrayList<String> donePasses) throws Exception {
+    public Boolean execute(Circuit example, Circuit target) throws Exception {
         return true;
     }
 }

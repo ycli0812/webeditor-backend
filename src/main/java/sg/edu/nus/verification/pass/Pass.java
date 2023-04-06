@@ -57,7 +57,7 @@ public abstract class Pass {
         for(String pre : this.preRequirements) {
             if(!donePasses.contains(pre)) return false;
         }
-        return this.execute(example, target, donePasses);
+        return this.execute(example, target);
     }
 
     /**
@@ -69,7 +69,7 @@ public abstract class Pass {
      * @return Result of execution
      * @throws Exception If something goes wrong, any type of exception might be thrown out
      */
-    public abstract Boolean execute(Circuit example, Circuit target, ArrayList<String> donePasses) throws Exception;
+    public abstract Boolean execute(Circuit example, Circuit target) throws Exception;
 
     public String getId() {
         return id;

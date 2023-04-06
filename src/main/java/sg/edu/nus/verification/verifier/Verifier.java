@@ -51,14 +51,32 @@ public class Verifier {
         return 0;
     }
 
+    public Boolean execute(Pass pass) {
+        boolean res = false;
+        this.output.add(new Info("Executing " + pass.getId() + ".", InfoType.INFO));
+        try {
+            res = pass.doExecute(this.example, this.target, this.donePasses);
+            this.output.addAll(pass.getOutput());
+        } catch (Exception e) {
+            System.out.println(e);
+            e.printStackTrace();
+            this.output.addAll(pass.getOutput());
+            this.output.add(new Info("An exception occurred in pass " + pass.getId() + ".", InfoType.ERROR));
+        } finally {
+            if(res) {
+                this.donePasses.add(pass.getId());
+                this.output.add(new Info(pass.getId() + " succeeded.", InfoType.SUCCESS));
+            } else {
+                this.output.add(new Info("Pass " + pass.getId() + " failed.", InfoType.ERROR));
+            }
+        }
+        return res;
+    }
+
     public Boolean executeAllPasses() {
         for(Pass p : this.passList) {
-            this.output.add(new Info("Execute " + p.getId() + ".", InfoType.INFO));
             if(!this.execute(p)) {
-                this.output.add(new Info("Verification aborted.", InfoType.ERROR));
                 return false;
-            } else {
-                this.output.add(new Info("Pass " + p.getId() + " completed.", InfoType.INFO));
             }
         }
         this.output.add(new Info("Verification done.", InfoType.SUCCESS));
@@ -90,27 +108,6 @@ public class Verifier {
         }
         this.passList.add(p);
         return true;
-    }
-
-    public Boolean execute(Pass pass) {
-        Boolean res;
-        try {
-            res = pass.execute(this.example, this.target, this.donePasses);
-            if(res) this.donePasses.add(pass.getId());
-            else {
-                this.output.add(new Info("Pass " + pass.getId() + " failed.", InfoType.ERROR));
-            }
-        } catch (Exception e) {
-            System.out.println(e);
-            e.printStackTrace();
-            this.output.add(new Info("An exception occurred in pass " + pass.getId() + ".", InfoType.ERROR));
-            res = false;
-        } finally {
-            this.output.addAll(pass.getOutput());
-        }
-//        res = pass.execute(this.example, this.target, this.donePasses);
-//        if(res) this.donePasses.add(pass.getId());
-        return res;
     }
 
     public void summaryInfo() {

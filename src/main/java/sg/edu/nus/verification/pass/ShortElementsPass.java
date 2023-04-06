@@ -21,7 +21,7 @@ public class ShortElementsPass extends Pass {
     }
 
     @Override
-    public Boolean execute(Circuit example, Circuit target, ArrayList<String> donePasses) throws Exception {
+    public Boolean execute(Circuit example, Circuit target) throws Exception {
         for(Element e : target.getElements()) {
             if(e.isShort()) {
                 this.addOutput(new Info("Short element found.", InfoType.WARNING, e.getOriginId()));

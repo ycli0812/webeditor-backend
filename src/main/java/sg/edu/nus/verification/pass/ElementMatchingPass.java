@@ -26,7 +26,7 @@ public class ElementMatchingPass extends Pass {
     }
 
     @Override
-    public Boolean execute(Circuit example, Circuit target, ArrayList<String> donePasses) throws Exception {
+    public Boolean execute(Circuit example, Circuit target) throws Exception {
         return this.matchElementAmount(example, target) && this.matchElementFeatures(example, target);
     }
 

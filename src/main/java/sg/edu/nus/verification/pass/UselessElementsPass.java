@@ -51,11 +51,11 @@ public class UselessElementsPass extends Pass {
     }
 
     @Override
-    public Boolean execute(Circuit example, Circuit target, ArrayList<String> donePasses) {
-        if(!this.checkPreRequirements(donePasses)) {
-            this.addOutput(new Info("Pre-requirements not satisfied.", InfoType.ERROR));
-            return false;
-        }
+    public Boolean execute(Circuit example, Circuit target) {
+//        if(!this.checkPreRequirements(donePasses)) {
+//            this.addOutput(new Info("Pre-requirements not satisfied.", InfoType.ERROR));
+//            return false;
+//        }
 
         Breadboard bd = this.findBreadboard(target);
 

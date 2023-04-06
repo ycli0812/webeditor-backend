@@ -38,11 +38,11 @@ public class ImpossibleConnectionPass extends Pass{
     }
 
     @Override
-    public Boolean execute(Circuit example, Circuit target, ArrayList<String> donePasses) throws Exception {
-        if(!this.checkPreRequirements(donePasses)) {
-            this.addOutput(new Info("Pre-requirements not satisfied.", InfoType.ERROR));
-            return false;
-        }
+    public Boolean execute(Circuit example, Circuit target) throws Exception {
+//        if(!this.checkPreRequirements(donePasses)) {
+//            this.addOutput(new Info("Pre-requirements not satisfied.", InfoType.ERROR));
+//            return false;
+//        }
 
         boolean res = true;
 
