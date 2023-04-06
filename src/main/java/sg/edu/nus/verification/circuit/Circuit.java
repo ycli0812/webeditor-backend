@@ -15,6 +15,7 @@ import sg.edu.nus.verification.element.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * A breadboard circuit.
@@ -50,7 +51,6 @@ public class Circuit {
             return;
         }
         Iterator<String> it = elements.fieldNames();
-        int eCount = 0; // Counter for elements
         while(it.hasNext()) {
             // Get id, type, and features
             String id = it.next();
@@ -68,7 +68,7 @@ public class Circuit {
 
             // get features
             JsonNode featuresNode = element.get("features");
-            ArrayList<Parameter> features = new ArrayList<Parameter>();
+            ArrayList<Parameter> features = new ArrayList<>();
             for(JsonNode featNode : featuresNode) {
                 String name = featNode.get("name").asText();
                 String value = featNode.get("value").asText();
@@ -80,15 +80,15 @@ public class Circuit {
             // Do not instantiate Element class since it is an abstract class
             switch (type) {
                 case "resistor": {
-                    this.elementList.add(new Resistor(String.valueOf(eCount), id, originX, originY, features, pins));
+                    this.elementList.add(new Resistor("unset", id, originX, originY, features, pins));
                     break;
                 }
                 case "breadboard": {
-                    this.elementList.add(new Breadboard(String.valueOf(eCount), id, originX, originY, features, pins));
+                    this.elementList.add(new Breadboard("unset", id, originX, originY, features, pins));
                     break;
                 }
                 case "wire": {
-                    this.elementList.add(new Wire(String.valueOf(eCount), id, originX, originY, features, pins));
+                    this.elementList.add(new Wire("unset", id, originX, originY, features, pins));
                     break;
                 }
                 default: break;
@@ -96,7 +96,7 @@ public class Circuit {
         }
     }
 
-    public ArrayList<Element> getElementList() {
+    public ArrayList<Element> getElements() {
         return elementList;
     }
 
@@ -106,8 +106,22 @@ public class Circuit {
      * @param id ID of the required element
      * @return The element found in the circuit, return null if there is not such an element
      */
-    public Element getElement(String id) {
-        // TODO: 2023/3/17 do find the element
-        return null;
+    public List<Element> getElementsById(String id) {
+        ArrayList<Element> res = new ArrayList<>();
+        for(Element e : this.elementList) {
+            if(e.getId() == id) {
+                res.add(e);
+            }
+        }
+        return res;
+    }
+
+    /**
+     * Remove an element from the circuit.
+     * @param e Element instance to be removed.
+     * @return If the element is successfully removed.
+     */
+    public boolean removeElement(Element e) {
+        return this.elementList.remove(e);
     }
 }

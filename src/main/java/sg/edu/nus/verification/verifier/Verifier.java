@@ -97,9 +97,13 @@ public class Verifier {
         try {
             res = pass.execute(this.example, this.target, this.donePasses);
             if(res) this.donePasses.add(pass.getId());
+            else {
+                this.output.add(new Info("Pass " + pass.getId() + " failed.", InfoType.ERROR));
+            }
         } catch (Exception e) {
             System.out.println(e);
             e.printStackTrace();
+            this.output.add(new Info("An exception occurred in pass " + pass.getId() + ".", InfoType.ERROR));
             res = false;
         } finally {
             this.output.addAll(pass.getOutput());
@@ -113,12 +117,6 @@ public class Verifier {
         for(Info info : this.output) {
             System.out.println(info.toString());
         }
-
-//        for(Pass p : this.passList) {
-//            for(Info info : p.getOutput()) {
-//                System.out.println(info.toString());
-//            }
-//        }
     }
 
     public ArrayList<Info> getOutput() {

@@ -53,6 +53,13 @@ public abstract class Pass {
         return true;
     }
 
+    public final boolean doExecute(Circuit example, Circuit target, ArrayList<String> donePasses) throws Exception {
+        for(String pre : this.preRequirements) {
+            if(!donePasses.contains(pre)) return false;
+        }
+        return this.execute(example, target, donePasses);
+    }
+
     /**
      * Entry of the real pass function.
      *

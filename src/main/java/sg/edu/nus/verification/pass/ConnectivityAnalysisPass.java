@@ -41,7 +41,8 @@ public class ConnectivityAnalysisPass extends Pass {
         Analyser analyser = new Analyser();
         // process target circuit
         analyser.analyse(target);
-        analyser.printResult();
+//        analyser.printResult();
+        analyser.analyse(example);
         // TODO process sample circuit
         return true;
     }
@@ -113,6 +114,7 @@ class Analyser {
         this.groupWireEnds();
         this.mergePinGroups();
         this.connectPins();
+        this.clearElements();
     }
 
     @TestOnly
@@ -147,7 +149,7 @@ class Analyser {
             for(Pin p : e.getPins()) {
                 int hash = this.getGroupHashCode(p.getOriginX(), p.getOriginY());
                 if(hash == -1) {
-                    System.out.println("Error: not on breadboard.");
+//                    System.out.println("Error: not on breadboard.");
                     continue;
                 }
                 if(this.elementGroupMap.get(hash) == null) {
@@ -284,7 +286,7 @@ class Analyser {
      * Put breadboards and wires into respective ArrayLists and the rest into another one.
      */
     private void classifyElements() {
-        for(Element e : circuit.getElementList()) {
+        for(Element e : circuit.getElements()) {
             if(Objects.equals(e.getType(), "breadboard")) {
                 this.breadboards.add((Breadboard) e);
                 continue;
@@ -294,6 +296,18 @@ class Analyser {
                 continue;
             }
             this.elements.add(e);
+        }
+    }
+
+    /**
+     * Remove all the connective elements(wires and breadboards, namely).
+     */
+    private void clearElements() {
+        for(Element wire : this.wires) {
+            this.circuit.removeElement(wire);
+        }
+        for(Element breadboard : this.breadboards) {
+            this.circuit.removeElement(breadboard);
         }
     }
 }

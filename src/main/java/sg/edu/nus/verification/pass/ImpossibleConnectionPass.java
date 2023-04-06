@@ -47,7 +47,7 @@ public class ImpossibleConnectionPass extends Pass{
         boolean res = true;
 
         HashMap<Integer, String> pinOwner = new HashMap<Integer, String>();
-        for(Element e : target.getElementList()) {
+        for(Element e : target.getElements()) {
             for(Pin pin : e.getPins()) {
                 int hashCode = Objects.hash(pin.getOriginX(), pin.getOriginY());
                 if(pinOwner.get(hashCode) == null) {

@@ -31,6 +31,11 @@ public class Breadboard extends Element{
     }
 
     @Override
+    public Boolean compareFeatures(Element e) {
+        return e.getType() == "breadboard";
+    }
+
+    @Override
     protected void analyseFeatures() {
         for(Parameter p : this.parameters) {
             switch (p.getName()) {

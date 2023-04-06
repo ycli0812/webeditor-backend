@@ -90,6 +90,8 @@ public abstract class Element {
 
     public abstract Boolean compareConnection(Element e); // Should be overridden by extended classes
 
+    public abstract Boolean compareFeatures(Element e);
+
     /**
      * Parse parameter list and assign feature properties.
      *

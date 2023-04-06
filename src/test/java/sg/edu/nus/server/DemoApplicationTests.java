@@ -5,10 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import sg.edu.nus.server.dao.VerificationTaskRepository;
 import sg.edu.nus.server.model.VerificationTask;
-import sg.edu.nus.verification.pass.ConnectivityAnalysisPass;
-import sg.edu.nus.verification.pass.ImpossibleConnectionPass;
-import sg.edu.nus.verification.pass.ShortElementsPass;
-import sg.edu.nus.verification.pass.UselessElementsPass;
+import sg.edu.nus.verification.pass.*;
 import sg.edu.nus.verification.verifier.Verifier;
 
 import java.io.File;
@@ -44,6 +41,7 @@ class DemoApplicationTests {
 		verifier.addPass(new ImpossibleConnectionPass());
 		verifier.addPass(new ConnectivityAnalysisPass());
 		verifier.addPass(new ShortElementsPass());
+		verifier.addPass(new ElementMatchingPass());
 		verifier.executeAllPasses();
 		verifier.summaryInfo();
 	}

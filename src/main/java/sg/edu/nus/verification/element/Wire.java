@@ -32,6 +32,11 @@ public class Wire extends Element{
     }
 
     @Override
+    public Boolean compareFeatures(Element e) {
+        return e.getType() == "wire";
+    }
+
+    @Override
     protected void analyseFeatures() {
         for(Parameter p : this.parameters) {
             switch(p.getName()) {

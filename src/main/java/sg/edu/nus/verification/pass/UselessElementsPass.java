@@ -41,7 +41,7 @@ public class UselessElementsPass extends Pass {
     private Breadboard findBreadboard(Circuit circuit) {
         // TODO: 2023/3/17 find all breadboard instead of the first one
         Breadboard bd = null;
-        for(Element e : circuit.getElementList()) {
+        for(Element e : circuit.getElements()) {
             if(e.getType().equals("breadboard")) {
                 bd = (Breadboard) e;
                 break;
@@ -66,12 +66,12 @@ public class UselessElementsPass extends Pass {
         }
 
         // Check all the elements
-        for (int i=0; i< target.getElementList().size(); i++) {
-            Element e = target.getElementList().get(i);
+        for (int i = 0; i< target.getElements().size(); i++) {
+            Element e = target.getElements().get(i);
             for(Pin pin : e.getPins()) {
                 if(!bd.isOnBreadboard(pin.getOriginX(), pin.getOriginY())) {
                     this.addOutput(new Info("Element not on breadboard.", InfoType.WARNING, e.getOriginId()));
-                    target.getElementList().remove(i);
+                    target.getElements().remove(i);
                     break;
                 }
             }
