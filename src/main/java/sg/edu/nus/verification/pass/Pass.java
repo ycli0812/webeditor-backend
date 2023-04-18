@@ -10,6 +10,7 @@ package sg.edu.nus.verification.pass;
 
 import sg.edu.nus.verification.circuit.Circuit;
 import sg.edu.nus.verification.info.Info;
+import sg.edu.nus.verification.info.InfoType;
 
 import java.util.ArrayList;
 
@@ -41,21 +42,21 @@ public abstract class Pass {
     }
 
     /**
-     * Check if all the pre-requirements are satisfied by the given list of IDs of executed passes.
+     * Check if all the pre-requirements are satisfied and call {@code execute()} method. This method is supposed to be
+     * called by verifiers.
      *
-     * @param donePasses List of IDs of executed passes
-     * @return Whether all IDs in {@code preRequirements} are in {@code donePasses}
+     * @param example Sample circuit
+     * @param target Target circuit
+     * @param donePasses List of executed pass IDs
+     * @return Result of execution
+     * @throws Exception Exception thrown by {@code execute()}
      */
-    protected Boolean checkPreRequirements(ArrayList<String> donePasses) {
-        for(String pre : this.preRequirements) {
-            if(!donePasses.contains(pre)) return false;
-        }
-        return true;
-    }
-
     public final boolean doExecute(Circuit example, Circuit target, ArrayList<String> donePasses) throws Exception {
         for(String pre : this.preRequirements) {
-            if(!donePasses.contains(pre)) return false;
+            if(!donePasses.contains(pre)) {
+                this.addOutput(new Info("Pre-requirements of " + this.getId() + " not satisfied.", InfoType.ERROR));
+                return false;
+            }
         }
         return this.execute(example, target);
     }
@@ -65,25 +66,24 @@ public abstract class Pass {
      *
      * @param example Sample circuit
      * @param target Target circuit
-     * @param donePasses List of IDs of executed passes
      * @return Result of execution
      * @throws Exception If something goes wrong, any type of exception might be thrown out
      */
     public abstract Boolean execute(Circuit example, Circuit target) throws Exception;
 
-    public String getId() {
+    public final String getId() {
         return id;
     }
 
-    public ArrayList<Info> getOutput() {
+    public final ArrayList<Info> getOutput() {
         return output;
     }
 
-    public ArrayList<String> getPreRequirements() {
+    public final ArrayList<String> getPreRequirements() {
         return preRequirements;
     }
 
-    protected void addOutput(Info info) {
+    protected final void addOutput(Info info) {
         this.output.add(info);
     }
 }

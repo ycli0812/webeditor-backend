@@ -8,10 +8,7 @@ import sg.edu.nus.server.dao.VerificationTaskRepository;
 import sg.edu.nus.server.model.VerificationTask;
 import sg.edu.nus.server.threads.VerificationThreadPoolExecutor;
 import sg.edu.nus.verification.info.Info;
-import sg.edu.nus.verification.pass.ConnectivityAnalysisPass;
-import sg.edu.nus.verification.pass.ImpossibleConnectionPass;
-import sg.edu.nus.verification.pass.ShortElementsPass;
-import sg.edu.nus.verification.pass.UselessElementsPass;
+import sg.edu.nus.verification.pass.*;
 import sg.edu.nus.verification.verifier.Verifier;
 
 import java.util.*;
@@ -53,6 +50,8 @@ public class VerificationService {
                 verifier.addPass(new ImpossibleConnectionPass());
                 verifier.addPass(new ConnectivityAnalysisPass());
                 verifier.addPass(new ShortElementsPass());
+                verifier.addPass(new ElementMatchingPass());
+                verifier.addPass(new ConnectionMatchingPass());
                 verifier.executeAllPasses();
                 // Transform output of algorithm and update database
                 List<Info> output = verifier.getOutput();

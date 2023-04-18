@@ -42,6 +42,7 @@ class DemoApplicationTests {
 		verifier.addPass(new ConnectivityAnalysisPass());
 		verifier.addPass(new ShortElementsPass());
 		verifier.addPass(new ElementMatchingPass());
+		verifier.addPass(new ConnectionMatchingPass());
 		verifier.executeAllPasses();
 		verifier.summaryInfo();
 	}

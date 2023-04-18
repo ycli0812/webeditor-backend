@@ -29,6 +29,14 @@ public class Resistor extends Element {
 
     @Override
     public Boolean compareConnection(Element e) {
+        if(this.id == "unset") return false;
+        if(e.getType() != this.getType()) return false;
+
+        for(Pin pForeign : e.getPins()) {
+            boolean matched = false;
+            for(Pin pThis : this.pins) {
+            }
+        }
         return true;
     }
 
